@@ -1,111 +1,252 @@
-Create a complete interactive web game using ONLY HTML, CSS, and JavaScript (no frameworks).
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>Ninja Pecahan V4</title>
 
-Game Title: Ninja Pecahan - Fruit Slice Jump Game
+<style>
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial;
+background:linear-gradient(to bottom,#87CEEB,#e0f7ff);
+}
 
-Target users: Year 2 primary school students in Malaysia
+#game{
+width:100vw;
+height:100vh;
+position:relative;
+}
 
-Language: Full Bahasa Melayu (Malay language UI)
+/* HUD */
+#hud{
+position:absolute;
+top:10px;
+left:10px;
+background:white;
+padding:10px;
+border-radius:10px;
+z-index:100;
+}
 
----
+/* NINJA */
+#ninja{
+position:absolute;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+font-size:70px;
+transition:0.2s;
+z-index:50;
+}
 
-GAME CONCEPT:
-The player is a ninja who jumps and slices falling fruits.
-Each fruit contains a fraction.
-The player must click/slice the fruit with the larger fraction.
+/* JUMP animation */
+.jump{
+transform:translateX(-50%) translateY(-120px);
+}
 
----
+/* FRUIT */
+.fruit{
+width:80px;
+height:80px;
+border-radius:50%;
+position:absolute;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+color:white;
+cursor:pointer;
+user-select:none;
+}
 
-CORE GAME FEATURES:
+/* COLORS */
+.red{background:#e63946;}
+.orange{background:#ff9f1c;}
+.green{background:#2a9d8f;}
 
-1. Ninja Character Animation
-- A ninja character at the bottom of the screen
-- Ninja must have a jumping animation when slicing fruit
-- Use emoji (🥷) or simple sprite
-- Ninja should move slightly upward when slicing
+/* SLASH EFFECT */
+.slash{
+position:absolute;
+font-size:60px;
+opacity:1;
+animation:slashAnim 0.4s forwards;
+pointer-events:none;
+}
 
-2. Fruit System
-- Fruits fall from the top of the screen
-- Each fruit displays a fraction (example: 1/2, 3/4, 2/3, 5/6)
-- Fruits appear randomly on different x positions
-- Two or more fruits can appear at once
+@keyframes slashAnim{
+0%{transform:scale(0.5) rotate(0deg);opacity:1;}
+100%{transform:scale(1.8) rotate(30deg);opacity:0;}
+}
 
-3. Fraction Logic
-- Correct answer = larger fraction value
-- Must calculate using JavaScript math logic (numerator/denominator)
-- Random fraction pairs each spawn
+/* START SCREEN */
+#start{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
 
-4. Slash Effect (VERY IMPORTANT)
-- When fruit is clicked:
-  - Show a glowing sword slash animation (⚔️ trail effect)
-  - Add motion blur or diagonal slash line
-  - Fruit should disappear with burst animation
+button{
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+</style>
+</head>
 
-5. Sound Effects
-- Add slicing sound effect (slice.mp3)
-- Sound plays every time fruit is sliced
-- Must reset audio so it can play repeatedly
-- Ensure user interaction allows sound playback
+<body>
 
-6. Scoring System
-- Correct slice: +10 points
-- Wrong slice: -5 points
-- Display score at top left
+<div id="game">
 
-7. Timer System
-- 60 seconds countdown
-- Game ends when time reaches 0
-- Show final score screen
+<div id="hud">
+🥷 Skor: <span id="score">0</span><br>
+⏱ Masa: <span id="time">60</span>
+</div>
 
-8. UI (Malay Language)
-Start Screen:
-"🥷 Selamat Datang Ninja Pecahan"
-"Potong buah yang mempunyai pecahan lebih besar!"
-Button: "MULA"
+<div id="ninja">🥷</div>
 
-During Game:
-"Skor", "Masa"
+<div id="start">
+<h1>🥷 Ninja Pecahan</h1>
+<p>Potong buah pecahan lebih besar!</p>
+<button onclick="startGame()">MULA</button>
+</div>
 
-Correct message:
-"Hebat!"
-"Tahniah Ninja!"
+</div>
 
-Wrong message:
-"Cuba Lagi!"
-"Fikir dengan teliti!"
+<script>
 
-Game Over:
-"Tamat Permainan"
-"Skor Akhir: ___"
-Button: "Main Semula"
+let score=0;
+let time=60;
+let started=false;
 
-9. Visual Style
-- Japanese ninja dojo background or bamboo forest
-- Bright colorful fruits (apple, orange, watermelon style)
-- Cartoon style, kid-friendly
+/* SOUND */
+let sliceSound = new Audio("slice.mp3");
 
-10. Animation Requirements
-- Fruits falling smoothly
-- Ninja jump animation when slicing
-- Slash effect must be visible and fast (0.3–0.5s)
-- Smooth transitions
+/* FRACTIONS */
+const data=[
+["1/2","1/4"],
+["3/4","2/4"],
+["2/3","1/3"],
+["5/6","2/6"],
+["7/8","3/8"],
+["3/5","2/5"]
+];
 
-11. Technical Requirements
-- Single file index.html OR simple structure
-- Pure HTML + CSS + JavaScript only
-- Must run on GitHub Pages
-- Mobile responsive design
-- No external frameworks
+function val(f){
+let p=f.split("/");
+return Number(p[0])/Number(p[1]);
+}
 
----
+/* START GAME */
+function startGame(){
 
-OPTIONAL FEATURES (if possible):
-- Combo system (streak score)
-- Background ninja music loop
-- Difficulty increase over time
-- Different fruit speeds
+document.getElementById("start").style.display="none";
+started=true;
 
----
+/* timer */
+setInterval(()=>{
+time--;
+document.getElementById("time").innerText=time;
+if(time<=0){
+alert("Tamat! Skor: "+score);
+location.reload();
+}
+},1000);
 
-OUTPUT:
-Return complete working code ready to upload to GitHub Pages.
-Must be fully functional with no missing parts.
+/* spawn */
+setInterval(spawn,1200);
+spawn();
+}
+
+/* NINJA JUMP */
+function ninjaJump(){
+let n=document.getElementById("ninja");
+n.classList.add("jump");
+setTimeout(()=>n.classList.remove("jump"),200);
+}
+
+/* SPAWN FRUIT */
+function spawn(){
+
+let pair=data[Math.floor(Math.random()*data.length)];
+
+let f1=pair[0];
+let f2=pair[1];
+
+let correct = val(f1)>val(f2)?f1:f2;
+
+createFruit(f1,20+Math.random()*30,correct);
+createFruit(f2,50+Math.random()*30,correct);
+}
+
+/* CREATE FRUIT */
+function createFruit(text,left,isCorrect){
+
+let fruit=document.createElement("div");
+fruit.classList.add("fruit");
+
+fruit.classList.add(Math.random()>0.5?"red":"orange");
+
+fruit.innerText=text;
+fruit.style.left=left+"%";
+fruit.style.top="-100px";
+
+document.getElementById("game").appendChild(fruit);
+
+/* fall */
+let pos=-100;
+let fall=setInterval(()=>{
+pos+=4;
+fruit.style.top=pos+"px";
+if(pos>window.innerHeight){
+fruit.remove();
+clearInterval(fall);
+}
+},20);
+
+/* CLICK */
+fruit.onclick=()=>{
+
+/* SOUND */
+sliceSound.currentTime=0;
+sliceSound.play();
+
+/* JUMP */
+ninjaJump();
+
+/* SLASH */
+let slash=document.createElement("div");
+slash.classList.add("slash");
+slash.innerText="⚔️";
+slash.style.left=fruit.style.left;
+slash.style.top=fruit.style.top;
+document.getElementById("game").appendChild(slash);
+setTimeout(()=>slash.remove(),400);
+
+fruit.remove();
+clearInterval(fall);
+
+/* SCORE */
+if(isCorrect){
+score+=10;
+}else{
+score-=5;
+}
+
+document.getElementById("score").innerText=score;
+};
+}
+
+</script>
+
+</body>
+</html>
