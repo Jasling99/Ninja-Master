@@ -1,135 +1,189 @@
-Create a complete educational web game using ONLY HTML, CSS, and JavaScript.
+Create a complete educational web game using HTML, CSS and JavaScript.
 
-Game Title: Ninja Pecahan - Banding Dua Pecahan
+Game title:
+Ninja Pecahan
 
-Target users: Year 2 primary school students (Malaysia)
+Target:
+Year 2 pupils in Malaysia.
 
-Language: Full Bahasa Melayu (Malay UI)
+Language:
+Bahasa Melayu only.
 
----
+================================================
 
-CORE GAME DESIGN (IMPORTANT):
+GAMEPLAY
 
-This is a ONE-TO-ONE COMPARISON GAME.
+This is NOT a Fruit Ninja falling-fruit game.
 
-Each round MUST show ONLY 2 items:
-- Fruit A with fraction
-- Fruit B with fraction
+Only ONE question appears at a time.
 
-Students must click the fruit with the larger fraction.
+Each question displays exactly TWO fruits side by side.
 
-NO multiple answers on screen at the same time.
+Example:
 
----
+🍎 2/3              🍊 3/4
 
-GAME CONCEPT:
+Students compare the fractions and choose the larger fraction.
 
-A ninja helps students compare fractions by slicing fruits.
+After the student answers:
 
-Each fruit represents a fraction.
+- Show feedback
+- Play animation
+- Then generate the next question
 
-Students must choose which fraction is bigger.
+Do NOT show multiple fruits.
+Do NOT continuously spawn fruits.
+Do NOT drop many fruits from the sky.
 
----
+================================================
 
-REQUIRED FEATURES:
+NINJA CHARACTER
 
-1. Fruit Display (IMPORTANT)
-- Use fruit emojis or images:
-  🍎 Apple
-  🍊 Orange
-  🍉 Watermelon
-  🍌 Banana
-- Each fruit must display a fraction clearly
-- Example:
-  🍎 3/4        VS        🍊 2/3
+Show a ninja character (🥷) at the bottom centre.
 
-2. One Round = Two Choices Only
-- Only TWO fruits appear per question
-- Left vs Right comparison layout
-- Clear spacing between both choices
+When the correct fruit is selected:
 
-3. Fraction Logic
-- Random fraction pairs
-- Correct answer = higher value fraction
-- Use JavaScript math (numerator/denominator)
+- Ninja jumps upward
+- Ninja performs a sword attack
+- A sword slash trail appears
+- The selected fruit is sliced into two pieces
+- Play slicing sound effect
 
-4. Ninja Interaction
-- Ninja character (🥷) at bottom of screen
-- When user clicks correct fruit:
-  - Ninja performs jump animation
-  - Sword slash effect appears (⚔️ trail animation)
+When the wrong fruit is selected:
 
-5. Slash Effect (VERY IMPORTANT)
-- Add visible slash animation when fruit is clicked
-- Diagonal glowing sword trail
-- Fade out animation within 0.3–0.5 seconds
+- Show "Cuba Lagi!"
+- Play a gentle wrong-answer sound
+- Shake the selected fruit slightly
 
-6. Sound Effect
-- Add slice sound effect (slice.mp3)
-- Must play every time fruit is clicked
-- Reset audio so it can replay repeatedly
+================================================
 
-7. Scoring System
-- Correct answer: +10 points
-- Wrong answer: -5 points
-- Show score at top left
+FRUITS
 
-8. Timer System
-- 60 seconds countdown
-- Game ends when time reaches 0
-- Show final score screen
+Use real fruit graphics or fruit emojis.
 
-9. UI (FULL MALAY LANGUAGE)
+Possible fruits:
+
+🍎 Apple
+🍊 Orange
+🍉 Watermelon
+🍌 Banana
+
+Display fraction clearly below the fruit.
+
+Example:
+
+🍎
+2/3
+
+================================================
+
+FRACTION CONTENT
+
+Include:
+
+Level 1
+Same denominator
+Example:
+3/8 vs 5/8
+
+Level 2
+Same numerator
+Example:
+3/5 vs 3/7
+
+Level 3
+Different denominators
+Example:
+2/3 vs 3/4
+
+Randomly generate questions.
+
+Use correct mathematical comparison logic.
+
+================================================
+
+SCORING
+
+Correct:
++10 points
+
+Wrong:
+-5 points
+
+Display:
+
+Skor: ___
+
+================================================
+
+TIMER
+
+60 second countdown.
+
+Display:
+
+Masa: ___
+
+When timer reaches zero:
+
+Show:
+
+Tamat Permainan
+
+Skor Akhir: ___
+
+Button:
+Main Semula
+
+================================================
+
+MALAY TEXT
 
 Start Screen:
-"🥷 Selamat Datang Ninja Pecahan"
-"Bandingkan dua pecahan dan pilih yang lebih besar!"
-Button: "MULA"
 
-During Game:
-"Skor"
-"Masa"
+🥷 Selamat Datang Ninja Pecahan
 
-Correct Answer:
-"Hebat!"
-"Tahniah Ninja!"
+Bandingkan dua pecahan dan pilih yang lebih besar.
 
-Wrong Answer:
-"Cuba Lagi!"
-"Fikir dengan teliti!"
+Button:
+MULA
 
-Game Over Screen:
-"Tamat Permainan"
-"Skor Akhir: ___"
-Button: "Main Semula"
+Correct:
 
----
+Hebat!
+Tahniah Ninja!
 
-10. Visual Design:
-- Japanese ninja dojo / bamboo forest background
-- Cute cartoon style
-- Bright colorful fruits
-- Mobile responsive layout
+Wrong:
 
----
+Cuba Lagi!
+Fikir dengan teliti!
 
-11. Animation Requirements:
-- Smooth fruit appearance (fade or drop)
-- Ninja jump animation on correct answer
-- Slash animation on every click
-- Fast feedback (instant response)
+================================================
 
----
+VISUAL STYLE
 
-12. Technical Requirements:
-- Single index.html file preferred
-- Pure HTML + CSS + JavaScript only
-- Must run on GitHub Pages
-- No frameworks (no React/Vue/etc.)
-- No external libraries
+Japanese ninja dojo.
 
----
+Bamboo forest background.
 
-OUTPUT REQUIREMENT:
-Return a fully working complete code that can be directly uploaded to GitHub Pages and run immediately without errors.
+Cute colourful cartoon style.
+
+Suitable for Year 2 pupils.
+
+================================================
+
+TECHNICAL
+
+Pure HTML CSS JavaScript.
+
+Single index.html.
+
+Compatible with GitHub Pages.
+
+Responsive for desktop and tablet.
+
+================================================
+
+OUTPUT
+
+Generate complete working code ready to upload directly to GitHub Pages.
