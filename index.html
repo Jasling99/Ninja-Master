@@ -1,252 +1,135 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-<meta charset="UTF-8">
-<title>Ninja Pecahan V4</title>
+Create a complete educational web game using ONLY HTML, CSS, and JavaScript.
 
-<style>
-body{
-margin:0;
-overflow:hidden;
-font-family:Arial;
-background:linear-gradient(to bottom,#87CEEB,#e0f7ff);
-}
+Game Title: Ninja Pecahan - Banding Dua Pecahan
 
-#game{
-width:100vw;
-height:100vh;
-position:relative;
-}
+Target users: Year 2 primary school students (Malaysia)
 
-/* HUD */
-#hud{
-position:absolute;
-top:10px;
-left:10px;
-background:white;
-padding:10px;
-border-radius:10px;
-z-index:100;
-}
+Language: Full Bahasa Melayu (Malay UI)
 
-/* NINJA */
-#ninja{
-position:absolute;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-font-size:70px;
-transition:0.2s;
-z-index:50;
-}
+---
 
-/* JUMP animation */
-.jump{
-transform:translateX(-50%) translateY(-120px);
-}
+CORE GAME DESIGN (IMPORTANT):
 
-/* FRUIT */
-.fruit{
-width:80px;
-height:80px;
-border-radius:50%;
-position:absolute;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-color:white;
-cursor:pointer;
-user-select:none;
-}
+This is a ONE-TO-ONE COMPARISON GAME.
 
-/* COLORS */
-.red{background:#e63946;}
-.orange{background:#ff9f1c;}
-.green{background:#2a9d8f;}
+Each round MUST show ONLY 2 items:
+- Fruit A with fraction
+- Fruit B with fraction
 
-/* SLASH EFFECT */
-.slash{
-position:absolute;
-font-size:60px;
-opacity:1;
-animation:slashAnim 0.4s forwards;
-pointer-events:none;
-}
+Students must click the fruit with the larger fraction.
 
-@keyframes slashAnim{
-0%{transform:scale(0.5) rotate(0deg);opacity:1;}
-100%{transform:scale(1.8) rotate(30deg);opacity:0;}
-}
+NO multiple answers on screen at the same time.
 
-/* START SCREEN */
-#start{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-color:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:999;
-}
+---
 
-button{
-padding:15px 30px;
-font-size:18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-}
-</style>
-</head>
+GAME CONCEPT:
 
-<body>
+A ninja helps students compare fractions by slicing fruits.
 
-<div id="game">
+Each fruit represents a fraction.
 
-<div id="hud">
-🥷 Skor: <span id="score">0</span><br>
-⏱ Masa: <span id="time">60</span>
-</div>
+Students must choose which fraction is bigger.
 
-<div id="ninja">🥷</div>
+---
 
-<div id="start">
-<h1>🥷 Ninja Pecahan</h1>
-<p>Potong buah pecahan lebih besar!</p>
-<button onclick="startGame()">MULA</button>
-</div>
+REQUIRED FEATURES:
 
-</div>
+1. Fruit Display (IMPORTANT)
+- Use fruit emojis or images:
+  🍎 Apple
+  🍊 Orange
+  🍉 Watermelon
+  🍌 Banana
+- Each fruit must display a fraction clearly
+- Example:
+  🍎 3/4        VS        🍊 2/3
 
-<script>
+2. One Round = Two Choices Only
+- Only TWO fruits appear per question
+- Left vs Right comparison layout
+- Clear spacing between both choices
 
-let score=0;
-let time=60;
-let started=false;
+3. Fraction Logic
+- Random fraction pairs
+- Correct answer = higher value fraction
+- Use JavaScript math (numerator/denominator)
 
-/* SOUND */
-let sliceSound = new Audio("slice.mp3");
+4. Ninja Interaction
+- Ninja character (🥷) at bottom of screen
+- When user clicks correct fruit:
+  - Ninja performs jump animation
+  - Sword slash effect appears (⚔️ trail animation)
 
-/* FRACTIONS */
-const data=[
-["1/2","1/4"],
-["3/4","2/4"],
-["2/3","1/3"],
-["5/6","2/6"],
-["7/8","3/8"],
-["3/5","2/5"]
-];
+5. Slash Effect (VERY IMPORTANT)
+- Add visible slash animation when fruit is clicked
+- Diagonal glowing sword trail
+- Fade out animation within 0.3–0.5 seconds
 
-function val(f){
-let p=f.split("/");
-return Number(p[0])/Number(p[1]);
-}
+6. Sound Effect
+- Add slice sound effect (slice.mp3)
+- Must play every time fruit is clicked
+- Reset audio so it can replay repeatedly
 
-/* START GAME */
-function startGame(){
+7. Scoring System
+- Correct answer: +10 points
+- Wrong answer: -5 points
+- Show score at top left
 
-document.getElementById("start").style.display="none";
-started=true;
+8. Timer System
+- 60 seconds countdown
+- Game ends when time reaches 0
+- Show final score screen
 
-/* timer */
-setInterval(()=>{
-time--;
-document.getElementById("time").innerText=time;
-if(time<=0){
-alert("Tamat! Skor: "+score);
-location.reload();
-}
-},1000);
+9. UI (FULL MALAY LANGUAGE)
 
-/* spawn */
-setInterval(spawn,1200);
-spawn();
-}
+Start Screen:
+"🥷 Selamat Datang Ninja Pecahan"
+"Bandingkan dua pecahan dan pilih yang lebih besar!"
+Button: "MULA"
 
-/* NINJA JUMP */
-function ninjaJump(){
-let n=document.getElementById("ninja");
-n.classList.add("jump");
-setTimeout(()=>n.classList.remove("jump"),200);
-}
+During Game:
+"Skor"
+"Masa"
 
-/* SPAWN FRUIT */
-function spawn(){
+Correct Answer:
+"Hebat!"
+"Tahniah Ninja!"
 
-let pair=data[Math.floor(Math.random()*data.length)];
+Wrong Answer:
+"Cuba Lagi!"
+"Fikir dengan teliti!"
 
-let f1=pair[0];
-let f2=pair[1];
+Game Over Screen:
+"Tamat Permainan"
+"Skor Akhir: ___"
+Button: "Main Semula"
 
-let correct = val(f1)>val(f2)?f1:f2;
+---
 
-createFruit(f1,20+Math.random()*30,correct);
-createFruit(f2,50+Math.random()*30,correct);
-}
+10. Visual Design:
+- Japanese ninja dojo / bamboo forest background
+- Cute cartoon style
+- Bright colorful fruits
+- Mobile responsive layout
 
-/* CREATE FRUIT */
-function createFruit(text,left,isCorrect){
+---
 
-let fruit=document.createElement("div");
-fruit.classList.add("fruit");
+11. Animation Requirements:
+- Smooth fruit appearance (fade or drop)
+- Ninja jump animation on correct answer
+- Slash animation on every click
+- Fast feedback (instant response)
 
-fruit.classList.add(Math.random()>0.5?"red":"orange");
+---
 
-fruit.innerText=text;
-fruit.style.left=left+"%";
-fruit.style.top="-100px";
+12. Technical Requirements:
+- Single index.html file preferred
+- Pure HTML + CSS + JavaScript only
+- Must run on GitHub Pages
+- No frameworks (no React/Vue/etc.)
+- No external libraries
 
-document.getElementById("game").appendChild(fruit);
+---
 
-/* fall */
-let pos=-100;
-let fall=setInterval(()=>{
-pos+=4;
-fruit.style.top=pos+"px";
-if(pos>window.innerHeight){
-fruit.remove();
-clearInterval(fall);
-}
-},20);
-
-/* CLICK */
-fruit.onclick=()=>{
-
-/* SOUND */
-sliceSound.currentTime=0;
-sliceSound.play();
-
-/* JUMP */
-ninjaJump();
-
-/* SLASH */
-let slash=document.createElement("div");
-slash.classList.add("slash");
-slash.innerText="⚔️";
-slash.style.left=fruit.style.left;
-slash.style.top=fruit.style.top;
-document.getElementById("game").appendChild(slash);
-setTimeout(()=>slash.remove(),400);
-
-fruit.remove();
-clearInterval(fall);
-
-/* SCORE */
-if(isCorrect){
-score+=10;
-}else{
-score-=5;
-}
-
-document.getElementById("score").innerText=score;
-};
-}
-
-</script>
-
-</body>
-</html>
+OUTPUT REQUIREMENT:
+Return a fully working complete code that can be directly uploaded to GitHub Pages and run immediately without errors.
