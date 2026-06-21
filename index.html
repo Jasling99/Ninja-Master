@@ -1,856 +1,262 @@
-Create a complete educational web game using HTML, CSS, and JavaScript.
+```html
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ninja Pecahan</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    background:linear-gradient(#87CEEB,#d4f4dd);
+    overflow:hidden;
+}
+
+h1{
+    color:#b22222;
+}
+
+#hud{
+    display:flex;
+    justify-content:space-around;
+    font-size:24px;
+    margin:10px;
+    font-weight:bold;
+}
+
+#gameArea{
+    margin-top:30px;
+}
+
+.fruit{
+    display:inline-block;
+    width:180px;
+    height:180px;
+    margin:20px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    cursor:pointer;
+    transition:0.3s;
+    font-size:60px;
+    padding-top:20px;
+}
+
+.fruit:hover{
+    transform:scale(1.05);
+}
+
+.frac{
+    font-size:36px;
+    margin-top:15px;
+}
+
+#ninja{
+    font-size:90px;
+    position:fixed;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    transition:0.4s;
+}
+
+.jump{
+    transform:translateX(-50%) translateY(-120px);
+}
+
+#feedback{
+    font-size:32px;
+    color:#006400;
+    height:50px;
+    margin-top:20px;
+}
+
+#nextBtn{
+    display:none;
+    padding:12px 25px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#ff9800;
+    color:white;
+    cursor:pointer;
+}
+
+.confetti{
+    position:absolute;
+    width:10px;
+    height:10px;
+    animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+    from{transform:translateY(-20px);}
+    to{transform:translateY(700px);}
+}
+</style>
+</head>
+
+<body>
 
-Game Title: Ninja Pecahan - Potong Buah yang Betul
+<h1>🥷 Ninja Pecahan</h1>
 
-Target users: Year 2 primary school students (Malaysia)
+<div id="hud">
+<div>⭐ Skor: <span id="score">0</span></div>
+<div>⏱ Masa: <span id="time">60</span></div>
+<div>📚 Tahap: 1</div>
+</div>
 
-Language: Full Malay language (Bahasa Melayu)
+<div id="gameArea"></div>
 
----
+<div id="feedback"></div>
 
-GAME CONCEPT:
-A ninja slicing fruit game to teach comparing fractions.
+<button id="nextBtn" onclick="nextQuestion()">
+➡️ Soalan Seterusnya
+</button>
 
-Students will see two fruits with fractions.
-They must click the fruit with the larger fraction.
+<div id="ninja">🥷</div>
 
----
+<script>
 
-FEATURES REQUIRED:
+const questions = [
+ {a:"3/8", b:"5/8"},
+ {a:"2/6", b:"4/6"},
+ {a:"1/5", b:"3/5"},
+ {a:"4/7", b:"6/7"}
+];
 
-1. Ninja Theme
-- A ninja character displayed at the bottom of the screen
-- Background: Japanese ninja dojo or bamboo forest style
+const fruits=["🍎","🍊","🍉","🍌"];
 
-2. Fruit Game Mechanic
-- Two fruits fall or appear at a time
-- Each fruit contains a fraction (e.g. 1/2, 3/4, 2/3)
-- Students click the correct (larger) fraction
+let current=0;
+let score=0;
+let time=60;
+let answered=false;
 
-3. Scoring System
-- Correct answer: +10 points
-- Wrong answer: -5 points
-- Display score at top left
+const sliceSound = new Audio("audio/slice.mp3");
+const successSound = new Audio("audio/success.mp3");
+const wrongSound = new Audio("audio/wrong.mp3");
 
-4. Timer
-- 60 seconds countdown
-- Game ends when time reaches 0
-- Show final score screen
+function value(frac){
+    let p=frac.split("/");
+    return Number(p[0])/Number(p[1]);
+}
 
-5. Slash Animation
-- When fruit is clicked, show ninja sword slash effect (⚔️ animation or visual effect)
-- Fruit disappears with animation
+function showQuestion(){
 
-6. Sound Effects
-- Add slicing sound effect when fruit is clicked (slice.mp3)
-- Ensure sound plays on user interaction
+    answered=false;
 
-7. Fractions Logic
-- Random fraction pairs
-- Must compare values correctly using math logic
+    if(current>=questions.length){
+        document.getElementById("gameArea").innerHTML=
+        "<h2>🏆 Tahniah! Tahap Selesai!</h2>";
+        document.getElementById("nextBtn").style.display="none";
+        return;
+    }
 
-8. UI Text (Malay)
-Start Screen:
-"🥷 Selamat Datang Ninja Pecahan"
-"Potong buah yang mempunyai pecahan lebih besar!"
-Button: "MULA"
+    let q=questions[current];
 
-Correct answer messages:
-"Hebat!"
-"Tahniah Ninja!"
+    let fruit1=fruits[Math.floor(Math.random()*fruits.length)];
+    let fruit2=fruits[Math.floor(Math.random()*fruits.length)];
 
-Wrong answer messages:
-"Cuba Lagi!"
-"Fikir dengan teliti!"
+    document.getElementById("gameArea").innerHTML=`
+    <div class='fruit' onclick="answer('${q.a}','${q.b}','a')">
+        ${fruit1}
+        <div class='frac'>${q.a}</div>
+    </div>
 
-Create a complete educational web game using HTML, CSS and JavaScript.
+    <span style="font-size:40px;">VS</span>
 
-GAME TITLE:
-🥷 Ninja Pecahan: Misi Ninja Master
+    <div class='fruit' onclick="answer('${q.a}','${q.b}','b')">
+        ${fruit2}
+        <div class='frac'>${q.b}</div>
+    </div>`;
+}
 
-TARGET USERS:
-Year 2 primary school students in Malaysia.
+function answer(a,b,choice){
 
-LANGUAGE:
-Use Bahasa Melayu for all instructions, buttons, messages and feedback.
+    if(answered) return;
+    answered=true;
 
-================================================
+    let correct = value(a)>value(b) ? "a":"b";
 
-GAME OBJECTIVE
+    document.getElementById("ninja").classList.add("jump");
 
-Students learn to compare fractions and identify the larger fraction.
+    setTimeout(()=>{
+        document.getElementById("ninja").classList.remove("jump");
+    },500);
 
-Students become a ninja and complete fraction missions to become Ninja Master.
+    sliceSound.currentTime=0;
+    sliceSound.play();
 
-The game must focus on comparing fractions, not just playing a fruit slicing game.
+    if(choice===correct){
 
-================================================
+        successSound.currentTime=0;
+        successSound.play();
 
-GAMEPLAY
+        score+=10;
+        document.getElementById("feedback").innerHTML=
+        "🎉 Hebat! Tahniah Ninja! +10";
 
-IMPORTANT:
+        confetti();
 
-Only ONE question appears at a time.
+    }else{
 
-Display EXACTLY TWO fruits only.
+        wrongSound.currentTime=0;
+        wrongSound.play();
 
-Example:
+        score-=5;
+        document.getElementById("feedback").innerHTML=
+        "❌ Cuba Lagi! -5";
+    }
 
-🍎
-3/8
+    document.getElementById("score").innerText=score;
 
-VS
+    document.getElementById("nextBtn").style.display="inline-block";
+}
 
-🍊
-5/8
+function nextQuestion(){
+    current++;
+    document.getElementById("feedback").innerHTML="";
+    document.getElementById("nextBtn").style.display="none";
+    showQuestion();
+}
 
-Students must click the fruit with the larger fraction.
+function confetti(){
 
-After answering:
+    for(let i=0;i<50;i++){
 
-* Show feedback
-* Play sound effects
-* Show animations
-* Continue to next question
+        let c=document.createElement("div");
+        c.className="confetti";
 
-Do NOT display many fruits.
-Do NOT continuously drop fruits.
-Do NOT create a traditional Fruit Ninja game.
+        c.style.left=Math.random()*window.innerWidth+"px";
 
-================================================
+        c.style.background=
+        ["red","blue","green","yellow","purple"]
+        [Math.floor(Math.random()*5)];
 
-LEVEL STRUCTURE
+        document.body.appendChild(c);
 
-There are 6 levels.
+        setTimeout(()=>c.remove(),3000);
+    }
+}
 
-Each level contains EXACTLY 4 questions.
+setInterval(()=>{
+    time--;
+    document.getElementById("time").innerText=time;
 
-Students must complete all 4 questions before unlocking the next level.
+    if(time<=0){
+        alert("⏰ Masa Tamat! Skor Akhir: "+score);
+        location.reload();
+    }
+},1000);
 
-================================================
+showQuestion();
 
-LEVEL 1
-Penyebut Sama
+</script>
 
-Questions:
+</body>
+</html>
+```
 
-3/8 VS 5/8
-2/6 VS 4/6
-1/5 VS 3/5
-4/7 VS 6/7
-
-Show reminder:
-
-"Apabila penyebut sama, pengangka yang lebih besar menunjukkan pecahan yang lebih besar."
-
-================================================
-
-LEVEL 2
-Penyebut Sama (Lebih Mencabar)
-
-Questions:
-
-7/10 VS 3/10
-5/9 VS 8/9
-2/12 VS 9/12
-6/11 VS 10/11
-
-================================================
-
-LEVEL 3
-Pengangka Sama
-
-Questions:
-
-3/5 VS 3/7
-2/4 VS 2/8
-1/2 VS 1/6
-4/5 VS 4/9
-
-Show reminder:
-
-"Apabila pengangka sama, penyebut yang lebih kecil menunjukkan pecahan yang lebih besar."
-
-================================================
-
-LEVEL 4
-Pengangka Sama (Lebih Mencabar)
-
-Questions:
-
-5/6 VS 5/8
-7/9 VS 7/12
-3/4 VS 3/10
-8/11 VS 8/15
-
-================================================
-
-LEVEL 5
-Pecahan Berbeza
-
-Questions:
-
-2/3 VS 3/4
-1/2 VS 2/5
-3/4 VS 5/8
-2/6 VS 1/2
-
-================================================
-
-LEVEL 6
-Boss Ninja
-
-Questions:
-
-5/6 VS 7/8
-3/4 VS 4/5
-2/3 VS 5/7
-7/10 VS 3/4
-
-================================================
-
-NINJA CHARACTER
-
-Display a cute cartoon ninja at the bottom center.
-
-When the correct answer is selected:
-
-* Ninja jumps upward.
-* Ninja performs a sword attack.
-* Ninja swings a katana.
-* Show a glowing sword slash effect.
-* Show sword trail animation.
-* The selected fruit splits into two pieces.
-* The fruit disappears after being sliced.
-
-================================================
-
-FRUITS
-
-Use colourful fruit graphics:
-
-🍎 Apple
-🍊 Orange
-🍉 Watermelon
-🍌 Banana
-
-Randomly choose fruit types.
-
-Display fractions clearly under each fruit.
-
-================================================
-
-SOUND EFFECTS
-
-Use local audio files:
-
-audio/slice.mp3
-audio/success.mp3
-audio/wrong.mp3
-audio/victory.mp3
-
-Correct answer:
-
-* Play slice.mp3
-* Play success.mp3
-
-Wrong answer:
-
-* Play wrong.mp3
-
-Final victory:
-
-* Play victory.mp3
-
-Audio must replay correctly every time.
-
-================================================
-
-CORRECT ANSWER EFFECTS
-
-Show:
-
-"Hebat!"
-"Tahniah Ninja!"
-
-Add:
-
-+10 Mata
-
-Effects:
-
-* Colourful confetti
-* Sparkles
-* Celebration particles
-* Success animation
-
-Confetti should fall from the top of the screen for 2–3 seconds.
-
-================================================
-
-WRONG ANSWER EFFECTS
-
-Show:
-
-"Cuba Lagi!"
-"Fikir dengan teliti!"
-
-Deduct:
-
--5 Mata
-
-Effects:
-
-* Fruit shakes briefly
-* Error sound
-* Red X animation
-
-================================================
-
-LEVEL COMPLETION EFFECT
-
-When all 4 questions in a level are completed:
-
-Show:
-
-"Tahniah! Anda berjaya ke Tahap Seterusnya!"
-
-Effects:
-
-* Large confetti celebration
-* Fireworks animation
-* Success sound
-
-Award titles:
-
-Level 1 = Ninja Apprentice
-Level 3 = Ninja Warrior
-Level 5 = Ninja Elite
-Level 6 = Ninja Master
-
-================================================
-
-SCORING SYSTEM
-
-Correct answer:
-+10 points
-
-Wrong answer:
--5 points
-
-Display:
-
-Skor: ___
-
-================================================
-
-TIMER
-
-60 second countdown.
-
-Display:
-
-Masa: ___
-
-================================================
-
-PROGRESS MAP
-
-Display all levels visually:
-
-Level 1 → Level 2 → Level 3 → Level 4 → Level 5 → Boss Ninja
-
-Highlight completed levels.
-
-================================================
-
-FINAL VICTORY SCREEN
-
-After completing Level 6:
-
-Display:
-
-🏆 TAHNIAH!
-
-ANDA TELAH MENJADI
-
-NINJA MASTER PECAHAN
-
-Display:
-
-Skor Akhir: ___
-
-Play victory music.
-
-Show:
-
-* Full-screen confetti
-* Fireworks animation
-* Sparkles
-* Celebration effects
-
-Button:
-
-Main Semula
-
-================================================
-
-VISUAL STYLE
-
-Background:
-
-Japanese bamboo forest.
-Ninja dojo.
-Mountains and cherry blossoms.
-
-Style:
-
-Cute cartoon game.
-Bright colourful design.
-Suitable for Year 2 pupils.
-
-================================================
-
-ANIMATIONS
-
-Required:
-
-* Ninja jump animation
-* Katana sword attack animation
-* Sword slash effect
-* Sword trail effect
-* Fruit slicing animation
-* Fruit split animation
-* Confetti animation
-* Fireworks animation
-* Fruit shake animation
-* Smooth transitions
-
-================================================
-
-TECHNICAL REQUIREMENTS
-
-Pure HTML, CSS and JavaScript.
-
-Create a complete educational web game using HTML, CSS and JavaScript.
-
-TITLE:
-🥷 Ninja Pecahan: Misi Ninja Master
-
-TARGET USERS:
-Year 2 primary school students in Malaysia.
-
-LANGUAGE:
-Use Bahasa Melayu for all instructions, buttons, messages and feedback.
-
-================================================
-
-GAME OBJECTIVE
-
-Students learn to compare fractions and identify the larger fraction.
-
-Students become a ninja and complete missions to become Ninja Master.
-
-The game must focus on learning and comparing fractions, not just slicing fruits.
-
-================================================
-
-GAMEPLAY
-
-IMPORTANT:
-
-Only ONE question appears at a time.
-
-Display EXACTLY TWO fruits only.
-
-Example:
-
-🍎
-3/8
-
-VS
-
-🍊
-5/8
-
-Students must click the fruit with the larger fraction.
-
-Do NOT display many fruits.
-Do NOT continuously drop fruits.
-Do NOT create a traditional Fruit Ninja game.
-
-================================================
-
-QUESTION TRANSITION
-
-IMPORTANT:
-
-Do NOT automatically move to the next question immediately.
-
-After the student answers, show all animations, sounds and feedback first.
-
-Wait 3 seconds.
-
-Then display a button:
-
-➡️ "Soalan Seterusnya"
-
-The next question only appears after the student clicks the button.
-
-================================================
-
-LEVEL STRUCTURE
-
-There are 6 levels.
-
-Each level contains EXACTLY 4 questions.
-
-Students must answer all 4 questions before unlocking the next level.
-
-================================================
-
-LEVEL 1
-Penyebut Sama
-
-Questions:
-
-3/8 VS 5/8
-2/6 VS 4/6
-1/5 VS 3/5
-4/7 VS 6/7
-
-Show reminder:
-
-"Apabila penyebut sama, pengangka yang lebih besar menunjukkan pecahan yang lebih besar."
-
-================================================
-
-LEVEL 2
-Penyebut Sama (Lebih Mencabar)
-
-Questions:
-
-7/10 VS 3/10
-5/9 VS 8/9
-2/12 VS 9/12
-6/11 VS 10/11
-
-================================================
-
-LEVEL 3
-Pengangka Sama
-
-Questions:
-
-3/5 VS 3/7
-2/4 VS 2/8
-1/2 VS 1/6
-4/5 VS 4/9
-
-Show reminder:
-
-"Apabila pengangka sama, penyebut yang lebih kecil menunjukkan pecahan yang lebih besar."
-
-================================================
-
-LEVEL 4
-Pengangka Sama (Lebih Mencabar)
-
-Questions:
-
-5/6 VS 5/8
-7/9 VS 7/12
-3/4 VS 3/10
-8/11 VS 8/15
-
-================================================
-
-LEVEL 5
-Pecahan Berbeza
-
-Questions:
-
-2/3 VS 3/4
-1/2 VS 2/5
-3/4 VS 5/8
-2/6 VS 1/2
-
-================================================
-
-LEVEL 6
-Boss Ninja
-
-Questions:
-
-5/6 VS 7/8
-3/4 VS 4/5
-2/3 VS 5/7
-7/10 VS 3/4
-
-================================================
-
-NINJA CHARACTER
-
-Display a cute cartoon ninja at the bottom center.
-
-When the student chooses the correct answer:
-
-* Ninja jumps upward.
-* Ninja performs a sword attack.
-* Ninja swings a katana.
-* Show a glowing sword slash effect.
-* Show a sword trail effect.
-* Show a fast slicing animation.
-* The selected fruit splits into two pieces.
-* The fruit disappears after being sliced.
-
-================================================
-
-FRUITS
-
-Use colourful fruit graphics:
-
-🍎 Apple
-🍊 Orange
-🍉 Watermelon
-🍌 Banana
-
-Display fractions clearly under each fruit.
-
-Randomly use different fruits.
-
-================================================
-
-SOUND EFFECTS
-
-Use local audio files:
-
-audio/slice.mp3
-audio/success.mp3
-audio/wrong.mp3
-audio/victory.mp3
-
-Correct answer:
-
-* Play slice.mp3
-* Play success.mp3
-
-Wrong answer:
-
-* Play wrong.mp3
-
-Final victory:
-
-* Play victory.mp3
-
-Audio must replay correctly every time.
-
-================================================
-
-CORRECT ANSWER EFFECTS
-
-When a student chooses the correct fruit:
-
-Show:
-
-"Hebat!"
-"Tahniah Ninja!"
-
-Add:
-
-+10 Mata
-
-Effects:
-
-* Colourful confetti falling from the top
-* Sparkles
-* Celebration particles
-* Success animation
-
-Confetti should continue for 2–3 seconds.
-
-================================================
-
-WRONG ANSWER EFFECTS
-
-When a student chooses the wrong fruit:
-
-Show:
-
-"Cuba Lagi!"
-"Fikir dengan teliti!"
-
-Deduct:
-
--5 Mata
-
-Effects:
-
-* Fruit shakes briefly
-* Error sound
-* Red X animation
-
-Show a simple explanation.
-
-Example:
-
-3/8 < 5/8
-
-"Apabila penyebut sama, pengangka yang lebih besar menunjukkan pecahan yang lebih besar."
-
-After 3 seconds display:
-
-➡️ "Cuba Semula"
-
-================================================
-
-LEVEL COMPLETION
-
-After completing all 4 questions in a level:
-
-Show:
-
-"Tahniah! Anda berjaya ke Tahap Seterusnya!"
-
-Effects:
-
-* Large confetti celebration
-* Fireworks animation
-* Celebration sound
-
-Award titles:
-
-Level 1 = Ninja Apprentice
-Level 3 = Ninja Warrior
-Level 5 = Ninja Elite
-Level 6 = Ninja Master
-
-================================================
-
-SCORING SYSTEM
-
-Correct answer:
-+10 points
-
-Wrong answer:
--5 points
-
-Display:
-
-Skor: ___
-
-================================================
-
-TIMER
-
-60 second countdown.
-
-Display:
-
-Masa: ___
-
-================================================
-
-PROGRESS MAP
-
-Display all levels visually:
-
-Level 1 → Level 2 → Level 3 → Level 4 → Level 5 → Boss Ninja
-
-Highlight completed levels.
-
-================================================
-
-FINAL VICTORY SCREEN
-
-After completing Level 6:
-
-Display:
-
-🏆 TAHNIAH!
-
-ANDA TELAH MENJADI
-
-NINJA MASTER PECAHAN
-
-Display:
-
-Skor Akhir: ___
-
-Play victory music.
-
-Show:
-
-* Full-screen confetti
-* Fireworks animation
-* Sparkles
-* Celebration effects
-
-Button:
-
-Main Semula
-
-================================================
-
-VISUAL STYLE
-
-Background:
-
-Japanese bamboo forest.
-Ninja dojo.
-Mountains and cherry blossoms.
-
-Style:
-
-Cute cartoon style.
-Bright colourful design.
-Suitable for Year 2 pupils.
-
-================================================
-
-ANIMATIONS
-
-Required:
-
-* Ninja jump animation
-* Katana sword attack animation
-* Sword slash animation
-* Sword trail effect
-* Fruit slicing animation
-* Fruit split animation
-* Confetti animation
-* Fireworks animation
-* Fruit shake animation
-* Smooth transitions
-
-================================================
-
-TECHNICAL REQUIREMENTS
-
-Pure HTML, CSS and JavaScript.
-
-No React.
-No Vue.
-No external frameworks.
-
-Responsive for desktop and tablet.
-
-Compatible with GitHub Pages.
-
-Folder structure:
-
-index.html
-
-audio/
-slice.mp3
-success.mp3
-wrong.mp3
-victory.mp3
-
-================================================
-
-OUTPUT
-
-Generate complete working code ready for direct upload to GitHub Pages.
-
-All code must be fully functional, playable and educational.
